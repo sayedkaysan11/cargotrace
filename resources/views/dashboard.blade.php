@@ -30,54 +30,11 @@
     <div class="dashboard-page">
         <section class="dashboard-hero-grid" aria-label="Global logistics overview">
             <article class="hero-visual">
-                <svg class="hero-globe" viewBox="0 0 980 420" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ilustrasi rute logistik global">
-                    <defs>
-                        <radialGradient id="globeFill" cx="55%" cy="42%">
-                            <stop stop-color="#12437c" stop-opacity=".85"/>
-                            <stop offset=".7" stop-color="#0a2350" stop-opacity=".75"/>
-                            <stop offset="1" stop-color="#07142b" stop-opacity=".2"/>
-                        </radialGradient>
-                        <radialGradient id="cityGlow">
-                            <stop stop-color="#7eeaff" stop-opacity=".95"/>
-                            <stop offset="1" stop-color="#1595ff" stop-opacity="0"/>
-                        </radialGradient>
-                        <filter id="softGlow"><feGaussianBlur stdDeviation="3"/></filter>
-                    </defs>
-                    <ellipse cx="620" cy="210" rx="415" ry="260" fill="url(#globeFill)" stroke="#4b9dff" stroke-opacity=".22"/>
-                    <g fill="none" stroke="#61a9ff" stroke-opacity=".16">
-                        <ellipse cx="620" cy="210" rx="325" ry="260"/>
-                        <ellipse cx="620" cy="210" rx="210" ry="260"/>
-                        <ellipse cx="620" cy="210" rx="100" ry="260"/>
-                        <path d="M208 210h824M253 110q367 115 734 0M253 310q367-115 734 0"/>
-                    </g>
-                    <g fill="#4a8bd0" fill-opacity=".29" stroke="#84c7ff" stroke-opacity=".22" stroke-width="1">
-                        <path d="m292 104 45-36 62 8 36 26 37-3 26 27-24 29-34 5-18 29-32 4-23 32-27-12-17-35-27-17-16-33-31-12Z"/>
-                        <path d="m411 242 39 5 31 37-6 44-28 33-16 46-24-11-8-43-21-31 7-44Z"/>
-                        <path d="m565 106 39-27 56 5 37 26-13 22-41 6-14 26-30-6-15-26-31 3Z"/>
-                        <path d="m590 169 49-18 49 14 27 41-24 58-40 42-27-14-6-54-37-20-15-34Z"/>
-                        <path d="m677 101 49-40 97 6 50 24 72-7 54 32-24 33-73 2-48 30-52-16-40 26-36-16-31-39-47-5Z"/>
-                        <path d="m796 241 47-21 57 20 38 36-22 24-63-7-43-23Z"/>
-                    </g>
-                    <g fill="none" stroke-width="2">
-                        <path class="hero-route route-cyan" d="M338 163 Q480 45 634 165 T850 145"/>
-                        <path class="hero-route route-blue" d="M450 286 Q598 134 755 203 T910 293"/>
-                        <path class="hero-route route-amber" d="M338 163 Q558 373 850 145"/>
-                    </g>
-                    <g>
-                        <circle cx="338" cy="163" r="20" fill="url(#cityGlow)"/><circle cx="634" cy="165" r="20" fill="url(#cityGlow)"/>
-                        <circle cx="850" cy="145" r="20" fill="url(#cityGlow)"/><circle cx="755" cy="203" r="18" fill="url(#cityGlow)"/>
-                        <circle cx="338" cy="163" r="4" fill="#9cf4ff"/><circle cx="634" cy="165" r="4" fill="#9cf4ff"/>
-                        <circle cx="850" cy="145" r="4" fill="#9cf4ff"/><circle cx="755" cy="203" r="4" fill="#9cf4ff"/>
-                    </g>
-                    <g class="hero-plane" fill="#d6edff" transform="translate(706 132) rotate(-13)">
-                        <path d="m0 8 30-6 14-13 5 1-7 14 17 2 7-4 3 2-6 8-23 1-10 14-4-1 3-13-28-1Z"/>
-                    </g>
-                    <g class="hero-ship" transform="translate(492 255)">
-                        <path d="M0 13h92l-12 17H16Z" fill="#1298df" stroke="#8beaff"/>
-                        <path d="M20 2h20v10H20zm22 0h20v10H42zm22 0h20v10H64z" fill="#ffb24c"/>
-                        <path d="M17 0h64" stroke="#78e4ff" stroke-width="2"/>
-                    </g>
-                </svg>
+                <div class="hero-globe-stage" id="hero-globe" data-endpoint="{{ route('dashboard.map-data') }}" aria-label="Interactive 3D globe. Recorded shipment routes appear when coordinates are available.">
+                    <img class="hero-globe-fallback" src="{{ asset('images/dashboard/hero-digital-globe.svg') }}?v={{ filemtime(public_path('images/dashboard/hero-digital-globe.svg')) }}" alt="" aria-hidden="true" fetchpriority="high" decoding="async">
+                    <div class="hero-globe-popover" id="hero-globe-popover" role="status" hidden></div>
+                    <span class="hero-globe-hint" id="hero-globe-hint">Drag / touch · Scroll / pinch to zoom</span>
+                </div>
                 <div class="hero-content">
                     <span class="hero-eyebrow"><i></i><span data-en="GLOBAL LOGISTICS PLATFORM" data-id="PLATFORM LOGISTIK GLOBAL">GLOBAL LOGISTICS PLATFORM</span></span>
                     <h1 data-en="Track Your Shipment<br>Across <em>The World</em>" data-id="Lacak Shipment<br>ke <em>Seluruh Dunia</em>">Track Your Shipment<br>Across <em>The World</em></h1>
@@ -180,8 +137,7 @@
                 </div>
                 <div class="map-canvas geographic-map" id="dashboard-map"
                     data-endpoint="{{ route('dashboard.map-data') }}"
-                    data-tile-standard="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    data-tile-dark="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                    data-tile-url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                     data-tracking-url="{{ url('/tracking') }}"
                     role="region" aria-label="Interactive geographic map of shipment routes">
                     <div class="map-loading" id="map-loading"><span></span>Loading shipment map…</div>
@@ -206,7 +162,7 @@
                         <span><i class="legend-destination"></i>Destination</span>
                         <span><i class="legend-position"></i>Recorded GPS</span>
                     </div>
-                    <div class="map-footer-meta"><span id="map-shipment-count">Loading shipment records…</span><span class="map-updated">Data checked <time id="map-last-updated">Waiting…</time> · positions reflect last recorded GPS</span><span class="map-tile-status" id="map-tile-status" hidden></span></div>
+                    <div class="map-footer-meta"><span id="map-shipment-count">Loading shipment records…</span><span class="map-updated">Data checked <time id="map-last-updated">Waiting…</time> · positions reflect last recorded GPS</span><span class="map-tile-status" id="map-tile-status" hidden><span id="map-tile-message"></span><button type="button" id="map-tile-retry">Retry tiles</button></span></div>
                 </div>
             </article>
 
@@ -324,6 +280,37 @@
                 <img src="{{ asset('images/news/cargo-vessel.svg') }}" alt="" loading="lazy">
                 <div class="connected-shade"></div>
                 <div class="connected-copy"><span class="heading-kicker">CARGOTRACE GLOBAL</span><h2 data-en="Smarter Logistics.<br>A More Connected World." data-id="Logistik Lebih Cerdas.<br>Dunia Lebih Terhubung.">Smarter Logistics.<br>A More Connected World.</h2><p>One clear view of every journey, from origin to destination.</p><a class="dashboard-button light" href="{{ route('map') }}">Explore the map <span aria-hidden="true">→</span></a></div>
+            </article>
+        </section>
+
+        <section class="dashboard-currency-section" aria-label="Currency converter">
+            <article class="panel currency-converter" id="currency-converter" data-endpoint="{{ route('dashboard.currency-rates') }}" aria-busy="true">
+                <div class="panel-heading">
+                    <div><span class="heading-kicker">CURRENCY TOOLS</span><h2 data-en="International currency converter" data-id="Konverter mata uang internasional">International currency converter</h2></div>
+                </div>
+                <div class="currency-converter-body">
+                    <label class="currency-field" for="currency-amount">
+                        <span>Amount</span>
+                        <input class="form-control" id="currency-amount" type="number" min="0" step="any" value="1" inputmode="decimal">
+                    </label>
+                    <label class="currency-field" for="currency-from">
+                        <span>From</span>
+                        <select class="form-control" id="currency-from" disabled aria-label="Convert from currency"></select>
+                    </label>
+                    <button class="currency-swap" id="currency-swap" type="button" aria-label="Swap currencies" disabled>⇄</button>
+                    <label class="currency-field" for="currency-to">
+                        <span>To</span>
+                        <select class="form-control" id="currency-to" disabled aria-label="Convert to currency"></select>
+                    </label>
+                    <div class="currency-result-wrap">
+                        <span class="currency-result-label">Converted amount</span>
+                        <output class="currency-result" id="currency-result" aria-live="polite">Loading exchange rates…</output>
+                    </div>
+                </div>
+                <div class="currency-footer">
+                    <span id="currency-rate-status" role="status">Fetching daily reference rates…</span>
+                    <a href="https://www.exchangerate-api.com/" target="_blank" rel="noopener noreferrer">Rates by ExchangeRate-API ↗</a>
+                </div>
             </article>
         </section>
     </div>
@@ -590,4 +577,6 @@
         })();
     </script>
     @vite('resources/js/dashboard-map.js')
+    @vite('resources/js/dashboard-globe.js')
+    @vite('resources/js/dashboard-currency.js')
 @endpush

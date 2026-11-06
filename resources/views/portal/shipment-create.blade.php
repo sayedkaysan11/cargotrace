@@ -80,6 +80,25 @@
                 <div class="form-group"><label for="item_weight">Berat (kg)</label><input class="form-control" id="item_weight" type="number" min="0" step="0.01" name="items[0][weight_kg]" value="{{ old('items.0.weight_kg', 0) }}" required></div>
                 <div class="form-group"><label for="item_volume">Volume (m³)</label><input class="form-control" id="item_volume" type="number" min="0" step="0.01" name="items[0][volume_cbm]" value="{{ old('items.0.volume_cbm', 0) }}" required></div>
             </div>
+            <section class="shipping-estimate" id="shipping-estimator" aria-labelledby="shipping-estimate-title">
+                <div class="shipping-estimate-heading">
+                    <div><h3 id="shipping-estimate-title">Estimasi biaya indikatif</h3><p>Perkiraan umum untuk membantu perencanaan, bukan penawaran carrier.</p></div>
+                    <label class="form-group shipping-estimate-mode" for="estimate-mode">
+                        <span class="form-help">Moda perhitungan</span>
+                        <select class="form-control" id="estimate-mode">
+                            <option value="air">Udara · berat volumetrik</option>
+                            <option value="sea">Laut · LCL / volume</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="shipping-estimate-result">
+                    <div><span class="form-help">Rentang perkiraan</span><strong id="estimate-price" aria-live="polite">Tambahkan detail barang</strong></div>
+                    <div><span class="form-help">Berat tertagih (udara)</span><strong id="estimate-chargeable-weight">0 kg</strong></div>
+                    <div><span class="form-help">Volume tertagih (laut)</span><strong id="estimate-chargeable-volume">0 CBM</strong></div>
+                </div>
+                <p class="shipping-estimate-note" id="estimate-basis">Tambahkan detail barang untuk melihat dasar perhitungan.</p>
+                <p class="shipping-estimate-note">Tarif indikatif standar: udara US$2–5/kg atau laut US$100–250/CBM. Priority menambah 35%; Special handling menambah 50%. Pajak, bea cukai, fuel surcharge, dan biaya carrier tidak termasuk. Estimasi tidak disimpan ke shipment.</p>
+            </section>
             <div class="toolbar" style="justify-content:flex-end;margin-top:18px">
                 <a class="btn subtle" href="{{ route('shipments.index') }}">Batal</a>
                 <button class="btn primary" type="submit">Buat Shipment</button>
@@ -87,3 +106,7 @@
         </div>
     </form>
 @endsection
+
+@push('scripts')
+    @vite('resources/js/shipment-estimator.js')
+@endpush

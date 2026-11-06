@@ -16,6 +16,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/map-data', [DashboardController::class, 'mapData'])->name('dashboard.map-data');
+    Route::get('/dashboard/currency-rates', [DashboardController::class, 'currencyRates'])->name('dashboard.currency-rates');
 
     Route::get('/shipments', [PortalController::class, 'shipments'])->name('shipments.index');
     Route::get('/shipments/create', [PortalController::class, 'createShipment'])

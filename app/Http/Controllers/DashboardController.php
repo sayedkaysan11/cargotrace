@@ -10,6 +10,7 @@ use App\Models\Location;
 use App\Models\Shipment;
 use App\Models\ShipmentException;
 use App\Models\TrackingEvent;
+use App\Services\CurrencyRateService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -18,6 +19,12 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    public function currencyRates(CurrencyRateService $rates): JsonResponse
+    {
+        return response()->json($rates->rates())
+            ->header('Cache-Control', 'private, max-age=900');
+    }
+
     public function mapData(Request $request): JsonResponse
     {
         $filters = $request->validate([

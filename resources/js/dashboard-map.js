@@ -43,35 +43,41 @@ const startMap = async () => {
         fadeAnimation: true,
         markerZoomAnimation: true,
     });
-    const tiles = {
-        standard: L.tileLayer(container.dataset.tileStandard, {
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-        }),
-        dark: L.tileLayer(container.dataset.tileDark, {
-            maxZoom: 20,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        }),
-    };
-    let activeTiles = tiles.dark;
+    const activeTiles = L.tileLayer(container.dataset.tileUrl, {
+        maxZoom: 19,
+        detectRetina: false,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+    });
     let fetchController = null;
     let refreshTimer = null;
     let tileErrors = 0;
     let hasLoaded = false;
 
     const tileStatus = document.getElementById('map-tile-status');
-    const updateTileStatus = (event) => {
-        if (event.type === 'tileerror') tileErrors += 1;
-        if (tileErrors > 0) {
-            tileStatus.hidden = false;
-            tileStatus.textContent = 'Some map tiles could not be loaded. Check your connection.';
-        } else if (hasLoaded) {
+    const tileMessage = document.getElementById('map-tile-message');
+    const retryTilesButton = document.getElementById('map-tile-retry');
+    const updateTileStatus = () => {
+        if (tileErrors === 0) {
             tileStatus.hidden = true;
+            tileMessage.textContent = '';
+            return;
         }
+
+        tileStatus.hidden = false;
+        tileMessage.textContent = tileErrors === 1
+            ? 'A map tile failed to load.'
+            : `${tileErrors} map tiles failed to load.`;
     };
-    activeTiles.on('tileerror', updateTileStatus);
+    activeTiles.on('loading', () => { tileErrors = 0; });
+    activeTiles.on('tileerror', () => {
+        tileErrors += 1;
+        updateTileStatus();
+    });
     activeTiles.on('load', updateTileStatus);
     activeTiles.addTo(map);
+    const tilePane = map.getPane('tilePane');
+    const applyTileStyle = () => tilePane.classList.toggle('map-tiles-dark', layerSelect.value === 'dark');
+    applyTileStyle();
 
     const routeLayer = L.featureGroup().addTo(map);
     const markerCluster = L.markerClusterGroup({
@@ -262,15 +268,15 @@ const startMap = async () => {
     document.getElementById('map-reset-view').addEventListener('click', () => map.setView(defaultView.center, defaultView.zoom, { animate: true }));
     document.getElementById('map-retry').addEventListener('click', () => refresh({ initial: !hasLoaded }));
     layerSelect.addEventListener('change', () => {
-        activeTiles.off('tileerror', updateTileStatus);
-        activeTiles.off('load', updateTileStatus);
-        map.removeLayer(activeTiles);
+        applyTileStyle();
+        map.invalidateSize({ pan: false });
+    });
+    retryTilesButton.addEventListener('click', () => {
         tileErrors = 0;
-        activeTiles = tiles[layerSelect.value];
-        activeTiles.on('tileerror', updateTileStatus);
-        activeTiles.on('load', updateTileStatus);
-        activeTiles.addTo(map);
         tileStatus.hidden = true;
+        activeTiles.redraw();
+        retryTilesButton.disabled = true;
+        window.setTimeout(() => { retryTilesButton.disabled = false; }, 5000);
     });
 
     const fullscreenButton = document.getElementById('map-fullscreen');
