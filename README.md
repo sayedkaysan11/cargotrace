@@ -19,6 +19,27 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 - [Robust background job processing](https://laravel.com/docs/queues).
 - [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
+## CargoTrace News
+
+The News page imports international logistics headlines from the configured BBC,
+Al Jazeera, and Google News RSS feeds. Google News queries also cover Reuters and
+CNN coverage. Articles are stored as linked headlines and metadata, deduplicated,
+and refreshed every two minutes by Laravel's scheduler; the page polls for newly
+imported items every two minutes and supports cursor-based infinite scrolling.
+
+Run `php artisan migrate` before starting the application. The local
+`composer run dev` command starts the web server, queue worker, Vite, and scheduler
+worker together. Pail is not included because it requires the `pcntl` PHP extension,
+which is unavailable in standard Windows PHP builds; local logs are written to
+`storage/logs`. In production, configure Laravel's scheduler to run
+`php artisan schedule:run` once per minute. You can run `php artisan news:sync`
+for an immediate fetch and to see per-feed failures.
+
+Feeds and their terms can change. Google News RSS is restricted to personal,
+non-commercial use; commercial deployments must replace it with a properly
+licensed news API/feed. Publisher names and article links are retained so readers
+can open the original reporting.
+
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
 ## Learning Laravel

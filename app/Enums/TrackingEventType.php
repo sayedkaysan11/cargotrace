@@ -14,6 +14,17 @@ enum TrackingEventType: string
     case CustomsClearance = 'CUSTOMS_CLEARANCE';
     case Delivered = 'DELIVERED';
     case Exception = 'EXCEPTION';
+    case Cancelled = 'CANCELLED';
+
+    /** Event types an operator may record by hand (CREATED / CANCELLED / EXCEPTION are system-generated). */
+    public static function manualValues(): array
+    {
+        return [
+            self::Booked->value, self::PickedUp->value, self::DepartedPort->value,
+            self::Transshipment->value, self::InTransit->value, self::ArrivedPort->value,
+            self::CustomsClearance->value, self::Delivered->value,
+        ];
+    }
 
     public static function values(): array
     {

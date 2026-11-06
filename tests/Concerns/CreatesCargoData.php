@@ -16,11 +16,14 @@ trait CreatesCargoData
         return User::factory()->create(array_merge(['role' => $role, 'is_active' => true], $attributes));
     }
 
-    protected function makeShipment(User $customer): Shipment
+    protected function makeCarrier(array $attributes = []): Carrier
     {
-        $carrier = Carrier::create(['name' => 'Test Carrier', 'code' => Str::upper(Str::random(6))]);
+        return Carrier::create(array_merge(['name' => 'Test Carrier', 'code' => Str::upper(Str::random(6))], $attributes));
+    }
 
-        $location = fn (string $city) => Location::create([
+    protected function makeLocation(string $city = 'Testville', array $attributes = []): Location
+    {
+        return Location::create(array_merge([
             'name' => "$city Port",
             'code' => Str::upper(Str::random(5)),
             'city' => $city,
@@ -28,17 +31,25 @@ trait CreatesCargoData
             'country_code' => 'TL',
             'latitude' => 1.0,
             'longitude' => 100.0,
-        ]);
+        ], $attributes));
+    }
 
-        return Shipment::create([
+    /** $overrides may set any shipments column, e.g. current_status, scenario, expected_* dates. */
+    protected function makeShipment(User $customer, array $overrides = []): Shipment
+    {
+        $attributes = array_merge([
             'shipment_number' => 'CT-TEST-' . Str::upper(Str::random(8)),
             'customer_id' => $customer->id,
-            'carrier_id' => $carrier->id,
-            'origin_location_id' => $location('Origin')->id,
-            'destination_location_id' => $location('Destination')->id,
+            'carrier_id' => $this->makeCarrier()->id,
+            'origin_location_id' => $this->makeLocation('Origin')->id,
+            'destination_location_id' => $this->makeLocation('Destination')->id,
             'cargo_type' => 'Test cargo',
             'expected_departure_at' => now()->addDay(),
             'expected_arrival_at' => now()->addDays(20),
-        ]);
+        ], $overrides);
+
+        $attributes['estimated_arrival_at'] ??= $attributes['expected_arrival_at'];
+
+        return Shipment::create($attributes);
     }
 }

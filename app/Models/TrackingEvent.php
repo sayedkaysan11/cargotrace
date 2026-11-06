@@ -40,4 +40,16 @@ class TrackingEvent extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function newsImage(): string
+    {
+        $image = match (true) {
+            $this->is_exception => 'weather-alert.svg',
+            in_array($this->event_type, [TrackingEventType::DepartedPort, TrackingEventType::ArrivedPort, TrackingEventType::Transshipment], true) => 'port-terminal.svg',
+            in_array($this->event_type, [TrackingEventType::InTransit, TrackingEventType::Delivered], true) => 'cargo-vessel.svg',
+            default => 'logistics-network.svg',
+        };
+
+        return asset('images/news/'.$image);
+    }
 }
